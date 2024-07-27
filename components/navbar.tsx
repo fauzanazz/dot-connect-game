@@ -6,10 +6,10 @@ import { JSX, SVGProps } from "react"
 import SignOut from "@/actions/auth";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
+import {useCurrentUser} from "@/hooks/use-current-user";
 
 export default function Navbar() {
-    const { data: user, status } = useSession();
-    const isSignedIn = status === "authenticated";
+    const user = useCurrentUser();
     const router = useRouter();
 
     const handleSignOut = async () => {
@@ -17,9 +17,7 @@ export default function Navbar() {
         router.push("/");
     }
 
-    if (status === "loading") {
-        return <div>Loading...</div>
-    }
+    const isSignedIn = !!user;
 
     return (
         <nav className="fixed inset-x-0 top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">

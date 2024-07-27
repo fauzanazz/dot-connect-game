@@ -12,12 +12,12 @@ const font = Poppins({
 
 export default function Home() {
   return (
-    <main className="flex h-full flex-col items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-500 to-blue-800">
+    <main className="flex h-full flex-col items-center justify-center">
       <div className="flex flex-col text-center gap-y-6">
-        <h1 className={cn("text-6xl font-semibold text-white drop-shadow-md", font.className,)}>
+        <h1 className={cn("text-6xl font-semibold text-black drop-shadow-md", font.className,)}>
           Dot Connect Game
         </h1>
-        <p className="text-2xl text-white">
+        <p className="text-2xl text-black">
           Task IRK
         </p>
         <div className="flex w-full justify-center gap-x-3">

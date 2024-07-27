@@ -12,13 +12,11 @@ export const {
 } = NextAuth({
     callbacks: {
       
-      async signIn({ user, account }) {
-
+      async signIn({ user}) {
         const ExistingUser = await getUserById(user.id)
         if (!ExistingUser) {
           return false
         }
-
         return true
       },
 
