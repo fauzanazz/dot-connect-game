@@ -29,18 +29,25 @@ export default function Navbar() {
                     </Link>
                     <nav className="hidden md:flex gap-4">
                         <Link
-                            href="#"
+                            href="/"
                             className="font-medium flex items-center text-sm transition-colors hover:underline"
                             prefetch={false}
                         >
                             Home
                         </Link>
                         <Link
-                            href="#"
+                            href="/about"
                             className="font-medium flex items-center text-sm transition-colors hover:underline"
                             prefetch={false}
                         >
                             About
+                        </Link>
+                        <Link
+                            href="/scoreboard"
+                            className="font-medium flex items-center text-sm transition-colors hover:underline"
+                            prefetch={false}
+                        >
+                            Scoreboard
                         </Link>
                     </nav>
                     <div className={`flex items-center gap-4`}>

@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import {ErrorCard} from "@/components/ErrorCard";
 
 interface GameSettingsProps {
-    onGameSettingsChange: (settings: { gameMode: any; difficultyLevel: any; customBoardFile: any; botAlgorithm: any }) => void;
+    onGameSettingsChange: (settings: {game: any, gameMode: any; difficultyLevel: any; customBoardFile: any; botAlgorithm: any }) => void;
     onGameStart: () => void;
 }
 
 export default function GameSettings({ onGameSettingsChange, onGameStart }: GameSettingsProps) {
+    const [game, setGame] = useState("Dot Connect");
     const [gameMode, setGameMode] = useState("manual");
     const [difficultyLevel, setDifficultyLevel] = useState("easy");
     const [customBoardFile, setCustomBoardFile] = useState(null);
@@ -21,13 +22,18 @@ export default function GameSettings({ onGameSettingsChange, onGameStart }: Game
 
     const handleGameModeChange = (mode: SetStateAction<string>) => {
         setGameMode(mode);
-        onGameSettingsChange({ gameMode: mode, difficultyLevel, customBoardFile, botAlgorithm });
+        onGameSettingsChange({ game, gameMode: mode, difficultyLevel, customBoardFile, botAlgorithm });
     };
 
     const handleDifficultyLevelChange = (level: SetStateAction<string>) => {
         setDifficultyLevel(level);
-        onGameSettingsChange({ gameMode, difficultyLevel: level, customBoardFile, botAlgorithm });
+        onGameSettingsChange({ game, gameMode, difficultyLevel: level, customBoardFile, botAlgorithm });
     };
+
+    const handleGameChange = (game: SetStateAction<string>) => {
+        setGame(game);
+        onGameSettingsChange({ game, gameMode, difficultyLevel, customBoardFile, botAlgorithm });
+    }
 
     const handleCustomBoardFileChange = (event: { target: { files: FileList } }) => {
         const file = event.target.files[0];
@@ -37,7 +43,7 @@ export default function GameSettings({ onGameSettingsChange, onGameStart }: Game
                 try {
                     const content = JSON.parse(e.target.result as string);
                     setCustomBoardFile(content);
-                    onGameSettingsChange({ gameMode, difficultyLevel, customBoardFile: content, botAlgorithm });
+                    onGameSettingsChange({ game, gameMode, difficultyLevel, customBoardFile: content, botAlgorithm });
                 } catch (error) {
                     setIsError(true);
                     setErrorMessage("Invalid board file, not a JSON probably");
@@ -49,7 +55,7 @@ export default function GameSettings({ onGameSettingsChange, onGameStart }: Game
 
     const handleBotAlgorithmChange = (algorithm: SetStateAction<string>) => {
         setBotAlgorithm(algorithm);
-        onGameSettingsChange({ gameMode, difficultyLevel, customBoardFile, botAlgorithm: algorithm });
+        onGameSettingsChange({ game, gameMode, difficultyLevel, customBoardFile, botAlgorithm: algorithm });
     };
 
     const handleStartGame = () => {
@@ -65,6 +71,25 @@ export default function GameSettings({ onGameSettingsChange, onGameStart }: Game
             {isError && ErrorCard({ error: errorMessage, onHide: () => setIsError(false) })}
             <div className="w-full max-w-md mx-auto p-6 bg-card rounded-lg shadow-md">
                 <h1 className="text-2xl font-bold mb-6">Game Settings</h1>
+                <div className="mb-6">
+                    <h2 className="text-lg font-medium mb-2">Game</h2>
+                    <div className="flex items-center space-x-4">
+                        <div
+                            className={`flex items-center space-x-2 cursor-pointer ${game === "Dot Connect" ? "text-primary" : "text-muted-foreground"}`}
+                            onClick={() => handleGameChange("Dot Connect")}
+                        >
+                            <HandIcon className="w-5 h-5"/>
+                            <span>Dot Connect</span>
+                        </div>
+                        <div
+                            className={`flex items-center space-x-2 cursor-pointer ${game === "Color Connect" ? "text-primary" : "text-muted-foreground"}`}
+                            onClick={() => handleGameChange("Color Connect")}
+                        >
+                            <BotIcon className="w-5 h-5"/>
+                            <span>Color Connect</span>
+                        </div>
+                    </div>
+                </div>
                 <div className="mb-6">
                     <h2 className="text-lg font-medium mb-2">Game Mode</h2>
                     <div className="flex items-center space-x-4">
@@ -132,58 +157,62 @@ export default function GameSettings({ onGameSettingsChange, onGameStart }: Game
                                     <CompassIcon className="w-5 h-5"/>
                                     <span>A*</span>
                                 </div>
-                                <div
-                                    className={`flex items-center space-x-2 cursor-pointer ${botAlgorithm === "bfs" ? "text-primary" : "text-muted-foreground"}`}
-                                    onClick={() => handleBotAlgorithmChange("bfs")}
-                                >
-                                    <LayersIcon className="w-5 h-5"/>
-                                    <span>BFS</span>
-                                </div>
-                                <div
-                                    className={`flex items-center space-x-2 cursor-pointer ${botAlgorithm === "dfs" ? "text-primary" : "text-muted-foreground"}`}
-                                    onClick={() => handleBotAlgorithmChange("dfs")}
-                                >
-                                    <RewindIcon className="w-5 h-5"/>
-                                    <span>DFS / Backtrack</span>
-                                </div>
+                                {game !== "Color Connect" && <div className="flex items-center space-x-4">
+                                    <div
+                                        className={`flex items-center space-x-2 cursor-pointer ${botAlgorithm === "bfs" ? "text-primary" : "text-muted-foreground"}`}
+                                        onClick={() => handleBotAlgorithmChange("bfs")}
+                                    >
+                                        <LayersIcon className="w-5 h-5"/>
+                                        <span>BFS</span>
+                                    </div>
+                                    <div
+                                        className={`flex items-center space-x-2 cursor-pointer ${botAlgorithm === "dfs" ? "text-primary" : "text-muted-foreground"}`}
+                                        onClick={() => handleBotAlgorithmChange("dfs")}
+                                    >
+                                        <RewindIcon className="w-5 h-5"/>
+                                        <span>DFS / Backtrack</span>
+                                    </div>
+                                </div>}
                             </div>
                         </div>
                     </div>
                 )}
                 {gameMode === "manual" &&
                     <div className="mb-6">
-                    <h2 className="text-lg font-medium mb-2">Difficulty</h2>
-                    <div className="flex items-center space-x-4">
-                        <div
-                            className={`flex items-center space-x-2 cursor-pointer ${difficultyLevel === "beginner" ? "text-primary" : "text-muted-foreground"}`}
-                            onClick={() => handleDifficultyLevelChange("beginner")}
-                        >
-                            <LeafIcon className="w-5 h-5"/>
-                            <span>Beginner</span>
+                        <h2 className="text-lg font-medium mb-2">Difficulty</h2>
+                        <div className="flex items-center space-x-4">
+                            <div
+                                className={`flex items-center space-x-2 cursor-pointer ${difficultyLevel === "beginner" ? "text-primary" : "text-muted-foreground"}`}
+                                onClick={() => handleDifficultyLevelChange("beginner")}
+                            >
+                                <LeafIcon className="w-5 h-5"/>
+                                <span>Beginner</span>
+                            </div>
+                            {game !== "Color Connect" && (<div className="flex items-center space-x-4">
+                                <div
+                                    className={`flex items-center space-x-2 cursor-pointer ${difficultyLevel === "easy" ? "text-primary" : "text-muted-foreground"}`}
+                                    onClick={() => handleDifficultyLevelChange("easy")}
+                                >
+                                    <SmileIcon className="w-5 h-5"/>
+                                    <span>Easy</span>
+                                </div>
+                                <div
+                                    className={`flex items-center space-x-2 cursor-pointer ${difficultyLevel === "medium" ? "text-primary" : "text-muted-foreground"}`}
+                                    onClick={() => handleDifficultyLevelChange("medium")}
+                                >
+                                    <BoltIcon className="w-5 h-5"/>
+                                    <span>Medium</span>
+                                </div>
+                                <div
+                                    className={`flex items-center space-x-2 cursor-pointer ${difficultyLevel === "hard" ? "text-primary" : "text-muted-foreground"}`}
+                                    onClick={() => handleDifficultyLevelChange("hard")}
+                                >
+                                    <FlameIcon className="w-5 h-5"/>
+                                    <span>Hard</span>
+                                </div>
+                            </div>)}
                         </div>
-                        <div
-                            className={`flex items-center space-x-2 cursor-pointer ${difficultyLevel === "easy" ? "text-primary" : "text-muted-foreground"}`}
-                            onClick={() => handleDifficultyLevelChange("easy")}
-                        >
-                            <SmileIcon className="w-5 h-5"/>
-                            <span>Easy</span>
-                        </div>
-                        <div
-                            className={`flex items-center space-x-2 cursor-pointer ${difficultyLevel === "medium" ? "text-primary" : "text-muted-foreground"}`}
-                            onClick={() => handleDifficultyLevelChange("medium")}
-                        >
-                            <BoltIcon className="w-5 h-5"/>
-                            <span>Medium</span>
-                        </div>
-                        <div
-                            className={`flex items-center space-x-2 cursor-pointer ${difficultyLevel === "hard" ? "text-primary" : "text-muted-foreground"}`}
-                            onClick={() => handleDifficultyLevelChange("hard")}
-                        >
-                            <FlameIcon className="w-5 h-5"/>
-                            <span>Hard</span>
-                        </div>
-                    </div>
-                </div>}
+                    </div>}
                 <div className="flex justify-end">
                     <Button onClick={handleStartGame}>Start Game</Button>
                 </div>

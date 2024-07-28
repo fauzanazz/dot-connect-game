@@ -11,9 +11,11 @@ const boardSizes: { [key in BoardSize]: [number, number] } = {
     hard: [12, 8]
 };
 
-export const GetBoard = async (size: BoardSize) => {
+// ======================== Dot Connect ========================
+
+export const GetBoardDotConnect = async (size: BoardSize) => {
     if (!size || !(size in boardSizes)) {
-        throw new Error('Invalid board size');
+        size = 'beginner';
     }
 
     let board;
@@ -114,3 +116,135 @@ const generateComplexPath = (rows: number, cols: number, start: [number, number]
 
     return path;
 }
+
+// ======================== Color Connect ========================
+const boardSizesColorConnect = {
+    beginner: 5,
+};
+const chain_limit = 5 - 3; // Minimum line length
+const iterations = 1000; // Number of iterations
+
+export const GetBoardColorConnect = async (size: string) => {
+    if (!size || !(size in boardSizesColorConnect)) {
+        size = 'beginner';
+    }
+
+    let board;
+    // @ts-ignore
+    board = generateBoardColorConnect(boardSizesColorConnect[size]);
+
+    return { board };
+};
+
+const generateBoardColorConnect = (size: any) => {
+    let board: string | any[] = baseMatrix(size);
+    for (let step = 0; step < iterations; step++) {
+        board = edgeSwitch(board);
+        board = shuffle(board);
+    }
+    console.log('Generated board:', flowPrinter(board));
+    console.log('Puzzle board:', flowPrinter_puzzle(board));
+    return flowPrinter_puzzle(board);
+};
+
+const baseMatrix = (dim: number) => {
+    const dic = [1, 2, 3, 4, 5]; // Colors
+    const A: string | any[] = [];
+    for (let i = 0; i < dim; i++) {
+        A.push([]);
+        for (let j = 0; j < dim; j++) {
+            A[i].push([[i + 1, j + 1], dic[i]]);
+        }
+    }
+    return A;
+};
+
+const edgeSwitch = (A: string | any[]) => {
+    let sw = false;
+    for (let i = 0; i < A.length; i++) {
+        if (sw) break;
+        for (let k1 = -1; k1 <= 0; k1++) {
+            if (sw) break;
+            const p = A[i][k1 === -1 ? A[i].length - 1 : 0][0];
+            for (let j = 0; j < A.length; j++) {
+                if (sw) break;
+                if (j === i) continue;
+                if (A[j].length === chain_limit) continue;
+                for (let k2 = -1; k2 <= 0; k2++) {
+                    if (sw) break;
+                    const pprime = A[j][k2 === -1 ? A[j].length - 1 : 0][0];
+                    if (distance(p, pprime) === 1.0) {
+                        const n1 = Math.random();
+                        if (n1 > 0.5) {
+                            if (k2 === -1) {
+                                A[j].pop();
+                            } else {
+                                A[j].shift();
+                            }
+                            if (k1 === -1) {
+                                A[i].push([pprime, A[i][0][1]]);
+                            } else {
+                                A[i].unshift([pprime, A[i][0][1]]);
+                            }
+                            sw = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return A;
+};
+
+const distance = (p: number[], pprime: number[]) => {
+    return Math.sqrt(Math.pow(p[0] - pprime[0], 2) + Math.pow(p[1] - pprime[1], 2));
+};
+
+const shuffle = (array: string | any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        // @ts-ignore
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+};
+
+const flowPrinter = (A: string | any[]) => {
+    const n = 5;
+    const na = 0;
+    const C = Array.from({ length: n }, () => Array(n).fill(na));
+
+    for (let i = 0; i < A.length; i++) {
+        for (let j = 0; j < A[i].length; j++) {
+            const x = A[i][j][0][0] - 1;
+            const y = A[i][j][0][1] - 1;
+            C[x][y] = A[i][j][1];
+        }
+    }
+
+    return C;
+};
+
+const flowPrinter_puzzle = (A: string | any[]) => {
+    const n = 5;
+    const na = 0;
+    const C = Array.from({ length: n }, () => Array(n).fill(na));
+
+    for (let i = 0; i < A.length; i++) {
+        const x1 = A[i][A[i].length-1][0][0] - 1;
+        const y1 = A[i][A[i].length-1][0][1] - 1;
+        C[x1][y1] = A[i][A[i].length-1][1];
+
+        const x2 = A[i][0][0][0] - 1;
+        const y2 = A[i][0][0][1] - 1;
+        C[x2][y2] = A[i][0][1];
+    }
+    return C;
+};
+
+
+
+
+
+
+

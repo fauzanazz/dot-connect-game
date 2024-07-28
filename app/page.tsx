@@ -1,8 +1,14 @@
+"use client"
+
+
 import { Poppins } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LoginButton } from "@/components/auth/login-button";
 import {RegisterButton} from "@/components/auth/register-button";
+import {useCurrentUser} from "@/hooks/use-current-user";
+import {useRouter} from "next/navigation";
+import SignOut from "@/actions/auth";
 
 const font = Poppins({
   subsets: ["latin"],
@@ -11,6 +17,20 @@ const font = Poppins({
 
 
 export default function Home() {
+  const user = useCurrentUser();
+  const isSignedIn = !!user;
+  const router = useRouter();
+
+  const handlePlayGame = async () => {
+    router.push("/games");
+  }
+
+  const handleLogout = async () => {
+    await SignOut();
+    setTimeout(() => {
+        router.refresh();
+    }, 2000);
+  }
   return (
     <main className="flex h-full flex-col items-center justify-center">
       <div className="flex flex-col text-center gap-y-6">
@@ -20,7 +40,7 @@ export default function Home() {
         <p className="text-2xl text-black">
           Task IRK
         </p>
-        <div className="flex w-full justify-center gap-x-3">
+        {!isSignedIn && <div className="flex w-full justify-center gap-x-3">
           <LoginButton>
             <Button variant="secondary" size="lg">
               Load Game
@@ -31,7 +51,18 @@ export default function Home() {
               Register
             </Button>
           </RegisterButton>
-        </div>
+          </div>
+        }
+        {
+          isSignedIn && <div className="flex w-full justify-center gap-x-3">
+            <Button variant="secondary" size="lg" onClick={handlePlayGame}>
+              Play Game
+            </Button>
+            <Button variant="secondary" size="lg" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
+        }
       </div>
     </main>
   )

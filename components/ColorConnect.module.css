@@ -1,0 +1,65 @@
+/* DotConnect.module.css */
+.boardContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.row {
+    display: flex;
+}
+
+.dot {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.blocked {
+    background-color: black;
+}
+
+.connected {
+    background-color: lightgreen;
+}
+
+.lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.color-1 {
+    background-color: red;
+}
+
+.color-2 {
+    background-color: blue;
+}
+
+.color-3 {
+    background-color: green;
+}
+
+.color-4 {
+    background-color: yellow;
+}
+
+.color-5 {
+    background-color: purple;
+}

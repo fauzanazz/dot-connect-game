@@ -337,3 +337,75 @@ class MinHeap<T> {
     }
 }
 
+
+class PuzzleState {
+    board: number[][];
+    cost: number;
+    heuristic: number;
+    totalCost: number;
+
+    constructor(board: number[][], cost: number = 0, heuristic: number = 0) {
+        this.board = board;
+        this.cost = cost;
+        this.heuristic = heuristic;
+        this.totalCost = cost + heuristic;
+    }
+}
+
+function isGoal(board: number[][]): boolean {
+    return board.every(row => row.every(cell => cell !== 0));
+}
+
+function getNeighbors(board: number[][], x: number, y: number): [number, number][] {
+    const neighbors: [number, number][] = [];
+    const directions: [number, number][] = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    for (const [dx, dy] of directions) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx >= 0 && nx < board.length && ny >= 0 && ny < board[0].length) {
+            neighbors.push([nx, ny]);
+        }
+    }
+    return neighbors;
+}
+
+function heuristic(board: number[][]): number {
+    return board.reduce((sum, row) => sum + row.filter(cell => cell === 0).length, 0);
+}
+
+function aStarSolver(initialBoard: number[][]): number[][] | null {
+    const startState = new PuzzleState(initialBoard, 0, heuristic(initialBoard));
+    const openList: PuzzleState[] = [startState];
+    const closedSet: Set<string> = new Set();
+
+    while (openList.length > 0) {
+        openList.sort((a, b) => a.totalCost - b.totalCost);
+        const currentState = openList.shift()!;
+        const currentBoard = currentState.board;
+
+        if (isGoal(currentBoard)) {
+            return currentBoard;
+        }
+
+        closedSet.add(JSON.stringify(currentBoard));
+
+        for (let x = 0; x < currentBoard.length; x++) {
+            for (let y = 0; y < currentBoard[0].length; y++) {
+                if (currentBoard[x][y] === 0) {
+                    for (const [nx, ny] of getNeighbors(currentBoard, x, y)) {
+                        if (currentBoard[nx][ny] !== 0) {
+                            const newBoard = currentBoard.map(row => row.slice());
+                            newBoard[x][y] = currentBoard[nx][ny];
+                            const newState = new PuzzleState(newBoard, currentState.cost + 1, heuristic(newBoard));
+                            if (!closedSet.has(JSON.stringify(newBoard))) {
+                                openList.push(newState);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}
+
