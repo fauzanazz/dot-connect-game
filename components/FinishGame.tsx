@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 
 interface FinishGameProps {
     time: number;
-    bestTime: number;
+    bestTime: string;
     onNewGame: () => void;
 }
 
@@ -27,12 +27,11 @@ export function FinishGame({time, bestTime, onNewGame}: FinishGameProps) {
     }
 
     const formattedTime = formatTime(time);
-    const formattedBestTime = formatTime(bestTime);
+    const formattedBestTime = bestTime
 
     const handleNewGame = () => {
         onNewGame();
     }
-
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">

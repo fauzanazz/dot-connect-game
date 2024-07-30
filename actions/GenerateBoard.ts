@@ -1,6 +1,6 @@
 "use server"
 
-import {isSolvableAStar} from "@/actions/IsSolvable";
+import {isSolvableAStar} from "@/actions/IsSolvableDC";
 
 export type BoardSize = 'beginner' | 'easy' | 'medium' | 'hard';
 

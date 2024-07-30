@@ -52,6 +52,10 @@ const DotConnectGame: React.FC<DotConnectGameProps> = ({ data, onFinished, solve
         }
         setLines(newLines);
         setVisitedDots(newVisitedDots);
+
+        setTimeout(() => {
+            onFinished?.();
+        }, 3000);
     }, [solvedData]);
 
     const findInMatrix = (matrix: number[][], target: number): Dot | null => {

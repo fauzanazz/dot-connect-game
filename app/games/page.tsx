@@ -1,21 +1,18 @@
 "use client"
 
-import {Poppins} from "next/font/google";
 import GameSettings from "@/components/GameSettings";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Spinner} from "@/components/ui/spinner";
 import {BoardSize, GetBoardColorConnect, GetBoardDotConnect} from "@/actions/GenerateBoard";
 import DotConnectGame from "@/components/DotConnect";
 import {FinishGame} from "@/components/FinishGame";
-import {solveAStar, solveBFS, solveDFS, solveIDDFS} from "@/actions/IsSolvable";
+import { solveAStar, solveBFS, solveDFS, solveIDDFS} from "@/actions/IsSolvableDC";
 import {ErrorCard} from "@/components/ErrorCard";
-import {timeout} from "d3";
 import ColorConnect from "@/components/ColorConnect";
+import {useCurrentUser} from "@/hooks/use-current-user";
+import {addNewScore, getHighestScoresByUser} from "@/actions/Scoreboard";
+import {solveColorConnect} from "@/actions/IsSolvableCC";
 
-const font = Poppins({
-    subsets: ["latin"],
-    weight: ["700"]
-})
 
 export default function Games() {
     const [game, setGame] = useState("dot-connect")
@@ -26,25 +23,15 @@ export default function Games() {
     const [isLoading, setIsLoading] = useState(false)
     const [board, setBoard] = useState<number[][]>([])
     const [botAlgorithm, setBotAlgorithm] = useState("astar")
+    const [startTime, setStartTime] = useState<Date | null>(null);
     const [time, setTime] = useState(0)
     const [isFinished, setIsFinished] = useState(false)
     const [isError, setIsError] = useState(false)
     const [errorMessage, setErrorMessage] = useState("")
     const [solvedBoard, setSolvedBoard] = useState<number[][]>([])
+    const [bestTime, setBestTime] = useState("")
 
-    useEffect(() => {
-        if (!gameStarted) return;
-
-        const interval = setInterval(() => {
-            if (isFinished) {
-                clearInterval(interval);
-                return;
-            }
-            setTime(time => time + 1);
-        }, 1);
-
-        return () => clearInterval(interval);
-    },[gameStarted, isFinished]);
+    const user = useCurrentUser();
 
     const handleOnGameSettingsChange = (settings: { game: any, gameMode: any; difficultyLevel: any; customBoardFile: any; botAlgorithm: any }) => {
         const {game, gameMode, difficultyLevel, customBoardFile} = settings;
@@ -68,38 +55,53 @@ export default function Games() {
         setBoard(board.board);
         setIsLoading(false);
         setGameStarted(true);
+        setStartTime(new Date());
 
         if (gameMode === "bot") {
             if (game === "Dot Connect") {
-                StartBotMoveDotConnect(board.board);
+                await StartBotMoveDotConnect(board.board);
             } else {
-
+                await StartBotMoveColorConnect(board.board);
             }
         }
     }
 
-    const StartBotMoveColorConnect = (board: number[][]) => {
+    const StartBotMoveColorConnect = async (board: number[][]) => {
+        let solvedBoard;
+        const startTime = Date.now();
+        solvedBoard = await solveColorConnect(board)
+        const endTime = Date.now();
+        const timeTaken = endTime - startTime;
+        setTime(timeTaken);
 
+        if (solvedBoard === null) {
+            setErrorMessage("Failed to solve the board");
+            setIsError(true);
+            return;
+        }
+
+        setSolvedBoard(solvedBoard)
     }
 
-    const StartBotMoveDotConnect = (board : number[][]) => {
+    const StartBotMoveDotConnect = async (board : number[][]) => {
         let solvedBoard;
+        setIsLoading(true)
         const startTime = Date.now();
 
         switch (botAlgorithm) {
             case "astar":
-                solvedBoard = solveAStar(board);
+                solvedBoard = await solveAStar(board);
                 break;
             case "dfs":
-                solvedBoard = solveDFS(board);
+                solvedBoard = await solveDFS(board);
                 break;
-            case "bfs":
-                solvedBoard = solveIDDFS(board);
+            case "iddfs":
+                solvedBoard = await solveIDDFS(board);
                 break;
             default:
-                solvedBoard = solveAStar(board);
+                solvedBoard = await solveAStar(board);
         }
-
+        setIsLoading(false)
         const endTime = Date.now();
         const timeTaken = endTime - startTime;
         setTime(timeTaken)
@@ -111,17 +113,37 @@ export default function Games() {
         }
 
         setSolvedBoard(solvedBoard)
-        setTimeout(() => {
-            setIsFinished(true);
-        }, 3000)
+
     }
 
-    const handleOnFinished = () => {
+    const handleOnFinished = async () => {
+        const endTime = new Date();
+
+        // @ts-ignore
+        const duration = endTime.getTime() - startTime.getTime();
+        const mode = gameMode;
+        let level = difficultyLevel;
+        if (mode === "bot") {
+            level = "custom";
+        }
+        const userId = user!.id;
+        await addNewScore(duration.toString(), game, mode, level, userId);
+        console.log("Score added successfully!");
+
+        // Get the new best score
+        const newBestScore = await getHighestScoresByUser(userId, game, mode, level);
+        console.log(userId, game, mode, level, newBestScore)
+        if (newBestScore.success) {
+            const score = newBestScore.success[0].score.toString();
+            setBestTime(score);
+        }
+
+        setTime(duration);
         setIsFinished(true);
-        // Upload score to the server
     }
 
     const handleOnNewGame = () => {
+        setSolvedBoard([]);
         setIsFinished(false);
         setGameStarted(false);
         setTime(0);
@@ -138,7 +160,7 @@ export default function Games() {
             { isLoading && <Spinner size="large" className="text-blue-950"/>}
             { gameStarted && !isLoading && game === "Dot Connect" && <DotConnectGame data={board} onFinished={handleOnFinished} solvedData={solvedBoard}/> }
             { gameStarted && !isLoading && game === "Color Connect" && <ColorConnect data={board} onFinished={handleOnFinished} solvedData={solvedBoard}/> }
-            { isFinished && <FinishGame time={time} bestTime={0} onNewGame={handleOnNewGame}/>}
+            { isFinished && <FinishGame time={time} bestTime={bestTime} onNewGame={handleOnNewGame}/>}
             { isError && <ErrorCard error={errorMessage} onHide={handleOnErrorClose}/>}
         </main>
     )

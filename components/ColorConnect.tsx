@@ -44,11 +44,11 @@ const ColorConnectGame: React.FC<DotConnectGameProps> = ({ data, onFinished, sol
 
     useEffect(() => {
         setBoard(data);
-        setLines([]);
         setSelectedDot(null);
+        setLines([]);
         setVisitedDots(new Map());
         setStack([]);
-    }, [data]);
+    }, []);
 
     useEffect(() => {
         if (!solvedData) return;
@@ -56,17 +56,20 @@ const ColorConnectGame: React.FC<DotConnectGameProps> = ({ data, onFinished, sol
         const newLines: Line[] = [];
         const newVisitedDots = new Map<string, number>();
         const length = 5;
-        for (let i = 1; i < length; i++) {
-            const from = findInMatrix(solvedData, i);
-            const to = findInMatrix(solvedData, i + 1);
-            if (from && to) {
-                newLines.push({ from, to });
-                newVisitedDots.set(`${from.row},${from.col}`, i);
-                newVisitedDots.set(`${to.row},${to.col}`, i);
+        for (let i = 1; i <= length; i++) {
+            const start = findInMatrix(solvedData, i);
+            const end = findInMatrix(solvedData, i + length);
+            if (start && end) {
+                newLines.push({ from: start, to: end, color: i });
+                newVisitedDots.set(`${start.row},${start.col}`, i);
             }
         }
         setLines(newLines);
         setVisitedDots(newVisitedDots);
+
+        setTimeout(() => {
+            onFinished?.();
+        }, 3000);
     }, [solvedData]);
 
     const DefaultBoard = data;
@@ -123,6 +126,10 @@ const ColorConnectGame: React.FC<DotConnectGameProps> = ({ data, onFinished, sol
             });
             setVisitedDots(newVisitedDots);
 
+            // Remove all dots that has the color of the visited dot
+            const newBoard = board.map(row => row.map(col => col === visitedDots.get(dotKey) ? 0 : col));
+            setBoard(newBoard);
+
             // Remove the visited dot from the stack
             const newStack = stack.filter(dot => `${dot.row},${dot.col}` !== dotKey);
             setStack(newStack);
@@ -134,18 +141,21 @@ const ColorConnectGame: React.FC<DotConnectGameProps> = ({ data, onFinished, sol
         } else {
             const newDot = { row, col };
             setSelectedDot(newDot);
-            setStack([...stack, newDot]);
-            setLines([...lines, { from: selectedDot, to: newDot, color: board[selectedDot.row][selectedDot.col]}]);
-            setVisitedDots(new Map(visitedDots.set(dotKey, board[selectedDot.row][selectedDot.col])));
-            setBoard(board.map((r, rowIndex) => r.map((c, colIndex) => rowIndex === row && colIndex === col ? board[selectedDot.row][selectedDot.col] : c)));
 
-            for (let r = 0; r < board.length; r++) {
-                for (let c = 0; c < board[0].length; c++) {
-                    if (DefaultBoard[r][c] !== 0) {
-                        if (board[r][c] !== DefaultBoard[r][c]) {
-                            const boardCopy = [...board];
-                            boardCopy[r][c] = DefaultBoard[r][c];
-                            setBoard(boardCopy);
+            if (selectedDot != newDot){
+                setStack([...stack, newDot]);
+                setLines([...lines, { from: selectedDot, to: newDot, color: board[selectedDot.row][selectedDot.col]}]);
+                setVisitedDots(new Map(visitedDots.set(dotKey, board[selectedDot.row][selectedDot.col])));
+                setBoard(board.map((r, rowIndex) => r.map((c, colIndex) => rowIndex === row && colIndex === col ? board[selectedDot.row][selectedDot.col] : c)));
+
+                for (let r = 0; r < board.length; r++) {
+                    for (let c = 0; c < board[0].length; c++) {
+                        if (DefaultBoard[r][c] !== 0) {
+                            if (board[r][c] !== DefaultBoard[r][c]) {
+                                const boardCopy = [...board];
+                                boardCopy[r][c] = DefaultBoard[r][c];
+                                setBoard(boardCopy);
+                            }
                         }
                     }
                 }

@@ -1,6 +1,6 @@
 // @ts-nocheck
-// @ts-nocheck
 "use client"
+
 
 import { JSX, SVGProps, SetStateAction, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -159,11 +159,11 @@ export default function GameSettings({ onGameSettingsChange, onGameStart }: Game
                                 </div>
                                 {game !== "Color Connect" && <div className="flex items-center space-x-4">
                                     <div
-                                        className={`flex items-center space-x-2 cursor-pointer ${botAlgorithm === "bfs" ? "text-primary" : "text-muted-foreground"}`}
-                                        onClick={() => handleBotAlgorithmChange("bfs")}
+                                        className={`flex items-center space-x-2 cursor-pointer ${botAlgorithm === "iddfs" ? "text-primary" : "text-muted-foreground"}`}
+                                        onClick={() => handleBotAlgorithmChange("iddfs")}
                                     >
                                         <LayersIcon className="w-5 h-5"/>
-                                        <span>BFS</span>
+                                        <span>IDDFS</span>
                                     </div>
                                     <div
                                         className={`flex items-center space-x-2 cursor-pointer ${botAlgorithm === "dfs" ? "text-primary" : "text-muted-foreground"}`}
@@ -222,7 +222,7 @@ export default function GameSettings({ onGameSettingsChange, onGameStart }: Game
 }
 
 
-function BoltIcon(props) {
+function BoltIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -244,7 +244,7 @@ function BoltIcon(props) {
 }
 
 
-function BotIcon(props) {
+function BotIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -269,7 +269,7 @@ function BotIcon(props) {
 }
 
 
-function CompassIcon(props) {
+function CompassIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -290,7 +290,7 @@ function CompassIcon(props) {
 }
 
 
-function Dice1Icon(props) {
+function Dice1Icon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -311,7 +311,7 @@ function Dice1Icon(props) {
 }
 
 
-function FlameIcon(props) {
+function FlameIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -332,7 +332,7 @@ function FlameIcon(props) {
 }
 
 
-function HandIcon(props) {
+function HandIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -356,7 +356,7 @@ function HandIcon(props) {
 }
 
 
-function LayersIcon(props) {
+function LayersIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -379,7 +379,7 @@ function LayersIcon(props) {
 }
 
 
-function LeafIcon(props) {
+function LeafIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -400,30 +400,8 @@ function LeafIcon(props) {
 }
 
 
-function RepeatIcon(props) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="m17 2 4 4-4 4"/>
-            <path d="M3 11v-1a4 4 0 0 1 4-4h14"/>
-            <path d="m7 22-4-4 4-4"/>
-            <path d="M21 13v1a4 4 0 0 1-4 4H3"/>
-        </svg>
-    )
-}
 
-
-function RewindIcon(props) {
+function RewindIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -444,7 +422,7 @@ function RewindIcon(props) {
 }
 
 
-function SmileIcon(props) {
+function SmileIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -467,7 +445,7 @@ function SmileIcon(props) {
 }
 
 
-function UploadIcon(props) {
+function UploadIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}

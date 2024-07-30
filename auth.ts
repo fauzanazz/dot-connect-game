@@ -25,6 +25,10 @@ export const {
           session.user.id = token.sub
         }
 
+        if (token.name && session.user) {
+            session.user.name = token.name
+        }
+
         return session
       },
 
