@@ -1,56 +1,69 @@
-import { Link } from "@nextui-org/link";
-import { Snippet } from "@nextui-org/snippet";
-import { Code } from "@nextui-org/code";
-import { button as buttonStyles } from "@nextui-org/theme";
+"use client"
 
-import { siteConfig } from "@/config/site";
-import { title, subtitle } from "@/components/primitives";
-import { GithubIcon } from "@/components/icons";
+
+import { Poppins } from "next/font/google";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { LoginButton } from "@/components/auth/login-button";
+import {RegisterButton} from "@/components/auth/register-button";
+import {useCurrentUser} from "@/hooks/use-current-user";
+import {useRouter} from "next/navigation";
+import SignOut from "@/actions/auth";
+
+const font = Poppins({
+  subsets: ["latin"],
+  weight: ["700"]
+})
+
 
 export default function Home() {
+  const user = useCurrentUser();
+  const isSignedIn = !!user;
+  const router = useRouter();
+
+  const handlePlayGame = async () => {
+    router.push("/games");
+  }
+
+  const handleLogout = async () => {
+    await SignOut();
+    setTimeout(() => {
+        router.refresh();
+    }, 2000);
+  }
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-      <div className="inline-block max-w-lg text-center justify-center">
-        <h1 className={title()}>Make&nbsp;</h1>
-        <h1 className={title({ color: "violet" })}>beautiful&nbsp;</h1>
-        <br />
-        <h1 className={title()}>
-          websites regardless of your design experience.
+    <main className="flex h-full flex-col items-center justify-center">
+      <div className="flex flex-col text-center gap-y-6">
+        <h1 className={cn("text-6xl font-semibold text-black drop-shadow-md", font.className,)}>
+          Dot Connect Game
         </h1>
-        <h2 className={subtitle({ class: "mt-4" })}>
-          Beautiful, fast and modern React UI library.
-        </h2>
+        <p className="text-2xl text-black">
+          Task IRK
+        </p>
+        {!isSignedIn && <div className="flex w-full justify-center gap-x-3">
+          <LoginButton>
+            <Button variant="secondary" size="lg">
+              Load Game
+            </Button>
+          </LoginButton>
+          <RegisterButton>
+            <Button variant="secondary" size="lg">
+              Register
+            </Button>
+          </RegisterButton>
+          </div>
+        }
+        {
+          isSignedIn && <div className="flex w-full justify-center gap-x-3">
+            <Button variant="secondary" size="lg" onClick={handlePlayGame}>
+              Play Game
+            </Button>
+            <Button variant="secondary" size="lg" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
+        }
       </div>
-
-      <div className="flex gap-3">
-        <Link
-          isExternal
-          className={buttonStyles({
-            color: "primary",
-            radius: "full",
-            variant: "shadow",
-          })}
-          href={siteConfig.links.docs}
-        >
-          Documentation
-        </Link>
-        <Link
-          isExternal
-          className={buttonStyles({ variant: "bordered", radius: "full" })}
-          href={siteConfig.links.github}
-        >
-          <GithubIcon size={20} />
-          GitHub
-        </Link>
-      </div>
-
-      <div className="mt-8">
-        <Snippet hideCopyButton hideSymbol variant="bordered">
-          <span>
-            Get started by editing <Code color="primary">app/page.tsx</Code>
-          </span>
-        </Snippet>
-      </div>
-    </section>
-  );
+    </main>
+  )
 }

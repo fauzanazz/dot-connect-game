@@ -1,13 +1,33 @@
-export default function AboutLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-      <div className="inline-block max-w-lg text-center justify-center">
+import { Inter } from 'next/font/google'
+import { cn } from '@/lib/utils'
+import Navbar from "@/components/navbar";
+
+const fontHeading = Inter({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-heading',
+})
+
+const fontBody = Inter({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-body',
+})
+
+// @ts-ignore
+export default function Layout({ children }) {
+    return (
+        <html lang="en">
+        <body
+            className={cn(
+                'antialiased',
+                fontHeading.variable,
+                fontBody.variable
+            )}
+        >
+        <Navbar />
         {children}
-      </div>
-    </section>
-  );
+        </body>
+        </html>
+    )
 }

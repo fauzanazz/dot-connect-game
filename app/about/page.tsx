@@ -1,9 +1,11 @@
-import { title } from "@/components/primitives";
+"use client"
+import AboutTemplate from "@/components/AboutTemplate";
 
-export default function AboutPage() {
-  return (
-    <div>
-      <h1 className={title()}>About</h1>
-    </div>
-  );
+export default function About() {
+
+    return (
+        <main style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+            <AboutTemplate />
+        </main>
+    )
 }
