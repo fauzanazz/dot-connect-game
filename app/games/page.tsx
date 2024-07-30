@@ -98,6 +98,9 @@ export default function Games() {
             case "iddfs":
                 solvedBoard = await solveIDDFS(board);
                 break;
+            case "bfs":
+                solvedBoard = await solveBFS(board);
+                break;
             default:
                 solvedBoard = await solveAStar(board);
         }

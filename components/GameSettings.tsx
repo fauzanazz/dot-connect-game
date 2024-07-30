@@ -172,6 +172,13 @@ export default function GameSettings({ onGameSettingsChange, onGameStart }: Game
                                         <RewindIcon className="w-5 h-5"/>
                                         <span>DFS / Backtrack</span>
                                     </div>
+                                    <div
+                                        className={`flex items-center space-x-2 cursor-pointer ${botAlgorithm === "bfs" ? "text-primary" : "text-muted-foreground"}`}
+                                        onClick={() => handleBotAlgorithmChange("bfs")}
+                                    >
+                                        <LayersIcon className="w-5 h-5"/>
+                                        <span>BFS</span>
+                                    </div>
                                 </div>}
                             </div>
                         </div>
