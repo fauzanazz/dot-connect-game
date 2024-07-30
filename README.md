@@ -5,7 +5,7 @@
 <div align="center">
 
 <p align="center">
-    Task IRK 2 : Queens Game Solver
+    Task IRK 5 : Dot Connect Game
     <br />
     <a href="https://github.com/ValentinoTriadi/Tubes2_OOP"><strong>Explore the docs »</strong></a>
     <br />
@@ -74,12 +74,13 @@ git clone https://github.com/fauzanazz/dot-connect-game
 ```sh
 npm install
 ```
-4. Run the project
+4. Create .env file in the root directory and fill with auth secret and database url
+5. Run the project
 ```sh
 npm run dev
 ```
-5. Open your browser and go to http://localhost:3000
-6. Enjoy the game
+6. Open your browser and go to http://localhost:3000
+7. Enjoy the game
 
 ## Project Status
 Project is: _completed_
